@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -17,7 +18,12 @@ func main() {
 		start := time.Now()
 		end := time.Now().AddDate(2, 0, 0)
 		timeRange := r.TimeRange{start, end}
-		schedule := r.ScheduleFromJSON(req.Body)
+		bytes, err := ioutil.ReadAll(req.Body)
+
+		if err != nil {
+			panic("Could not read request body")
+		}
+		schedule := r.UnmarshalJSON(bytes)
 
 		dates := make([]string, 0)
 		for o := range schedule.Occurrences(timeRange) {
@@ -28,11 +34,16 @@ func main() {
 	})
 
 	m.Post("/marshal-test", func(ren render.Render, req *http.Request) {
-		ren.JSON(200, r.ScheduleFromJSON(req.Body))
+		bytes, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			panic("Could not read request body")
+		}
+		schedule := r.UnmarshalJSON(bytes)
+		ren.JSON(200, schedule)
 	})
 
 	m.Get("/example", func(ren render.Render) {
-		s := r.Difference{
+		s := r.Exclusion{
 			r.Intersection{
 				r.Friday,
 				r.Union{
@@ -41,7 +52,7 @@ func main() {
 					r.August,
 				},
 			},
-			r.Year(1000),
+			r.Day(13),
 		}
 
 		ren.JSON(200, s)

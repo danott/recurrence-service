@@ -1,0 +1,29 @@
+{
+	"ImportPath": "github.com/danott/recurrence-service",
+	"GoVersion": "go1.2.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Rev": "346a984957aa24276ebc5e7b16b3ac6a50fe8138"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/martini",
+			"Comment": "v0.1-79-gec4ae4a",
+			"Rev": "ec4ae4a9fa9e404c1a7ca3b3419d6b75649aaee7"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/martini-contrib/binding",
+			"Comment": "v0.1-159-g8ce6181",
+			"Rev": "8ce6181c2609699e4c7cd30994b76a850a9cdadc"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/martini-contrib/render",
+			"Comment": "v0.1-159-g8ce6181",
+			"Rev": "8ce6181c2609699e4c7cd30994b76a850a9cdadc"
+		},
+		{
+			"ImportPath": "github.com/danott/recurrence",
+			"Rev": "288a52e28bba1d1c6ad6bece61289ecf243434fa"
+		}
+	]
+}

@@ -23,7 +23,7 @@ func main() {
 	m.Get("/schedules/:sha", ScheduleShow)
 	m.Delete("/schedules/:sha", ScheduleDelete)
 	m.Post("/schedules", binding.Json(r.ScheduleStruct{}), ScheduleCreate)
-	m.Post("/schedules/preview", binding.Json(RecurrenceParams{}), SchedulePreview)
+	m.Post("/schedules/preview", binding.Json(PreviewParams{}), SchedulePreview)
 
 	m.Run()
 }
@@ -42,7 +42,7 @@ func DB() martini.Handler {
 	}
 }
 
-func SchedulePreview(ren render.Render, params RecurrenceParams) {
+func SchedulePreview(ren render.Render, params PreviewParams) {
 	var dates []time.Time
 
 	for o := range params.Schedule.Occurrences(params.TimeRange) {
@@ -69,12 +69,9 @@ func ScheduleDelete(res http.ResponseWriter, params martini.Params, store simple
 
 func ScheduleShow(ren render.Render, params martini.Params, store simpleStore, req *http.Request) {
 	var timeRange r.TimeRange
-
 	timeRangeString := `{"start":"` + req.URL.Query().Get("start") + `","end":"` + req.URL.Query().Get("end") + `"}`
-	err := json.Unmarshal([]byte(timeRangeString), &timeRange)
-	if err != nil {
-		timeRange = r.TimeRange{time.Now(), time.Now().AddDate(2, 0, 0)}
-	}
+	json.Unmarshal([]byte(timeRangeString), &timeRange)
+	timeRange = timeRangeApplyDefaults(timeRange)
 
 	schedule, ok := store[params["sha"]]
 

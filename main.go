@@ -22,7 +22,7 @@ func main() {
 	m.Get("/schedules", ScheduleIndex)
 	m.Get("/schedules/:sha", ScheduleShow)
 	m.Delete("/schedules/:sha", ScheduleDelete)
-	m.Post("/schedules", binding.Json(r.ScheduleStruct{}), ScheduleCreate)
+	m.Post("/schedules", binding.Json(r.AnySchedule{}), ScheduleCreate)
 	m.Post("/schedules/preview", binding.Json(PreviewParams{}), SchedulePreview)
 
 	m.Run()
@@ -56,7 +56,7 @@ func ScheduleIndex(ren render.Render, store simpleStore) {
 	ren.JSON(200, store)
 }
 
-func ScheduleCreate(ren render.Render, schedule r.ScheduleStruct, store simpleStore) {
+func ScheduleCreate(ren render.Render, schedule r.AnySchedule, store simpleStore) {
 	scheduleId := ScheduleId(schedule)
 	store[scheduleId] = schedule
 	ren.JSON(200, scheduleId)

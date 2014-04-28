@@ -5,6 +5,8 @@ Calendar recurrence rules in Go.
 
 Basically, implementing the strategy described in [Martin Fowler's paper](http://martinfowler.com/apsupp/recurring.pdf). Read it. It's fun.
 
+Check out the [full docs on godoc.org](http://godoc.org/github.com/danott/recurrence)
+
 ## Schedule
 
 The `Schedule` interface is the foundation of the recurrence package. By using and combining schedules, we can represent all kinds of recurrence rules.
@@ -17,9 +19,9 @@ The `Schedule` interface is the foundation of the recurrence package. By using a
 Integer day of the month, 1 through 31, or the constant `Last`.
 
 ```go
-first := Day(First) // Day(1)
-last := Day(Last)
-twentieth := Day(20)
+first := recurrence.Day(recurrence.First)
+last := recurrence.Day(recurrence.Last)
+twentieth := recurrence.Day(20)
 ```
 
 ## Week
@@ -27,9 +29,9 @@ twentieth := Day(20)
 Integer week of the month, 1 through 5, or the constant `Last`.
 
 ```go
-first := Week(First) // Week(1)
-last := Week(Last)
-third := Week(Third) // Week(3)
+first := recurrence.Week(recurrence.First)
+last := recurrence.Week(recurrence.Last)
+third := recurrence.Week(recurrence.Third)
 ```
 
 ## Weekday
@@ -37,7 +39,7 @@ third := Week(Third) // Week(3)
 Day of the week, Sunday through Monday. Constants are defined so you can use them with ease.
 
 ```go
-Sunday.IsOccurring(time.Now())
+recurrence.Sunday.IsOccurring(time.Now())
 ```
 
 ## Month
@@ -45,7 +47,32 @@ Sunday.IsOccurring(time.Now())
 A month of the year. Constants are defined to be used with ease.
 
 ```go
-January.IsOccurring(time.Now())
+recurrence.January.IsOccurring(time.Now())
+```
+
+## Year
+
+A year.
+
+```go
+the_future := recurrence.Year(2525)
+```
+
+## TimeRange
+
+A range of time. Primarily used as an argument to `schedule.Occurrences(t recurrence.TimeRange) chan time.Time`
+
+It can also act as a schedule. Any day within the time range is considered as occurring.
+
+```go
+forty_days := recurrence.TimeRange{time.Now(), time.Now().AddDate(0, 0, 40)}
+```
+
+Some shortcuts are provided for common time ranges.
+
+```go
+recurrence.YearRange(2525)
+recurrence.MonthRange(time.January, 2525)
 ```
 
 ## Set Operations
@@ -55,8 +82,7 @@ January.IsOccurring(time.Now())
 Intersection is a slice of Schedules. `IsOccurring` is only satisfied if all members of the slice are true. (Set intersection).
 
 ```go
-// Complex Rules
-american_thanksgiving := recurrence.Intersection{Week(4), Thursday, November}
+american_thanksgiving := recurrence.Intersection{recurrence.Week(4), recurrence.Thursday, recurrence.November}
 ```
 
 ### Union
@@ -64,7 +90,7 @@ american_thanksgiving := recurrence.Intersection{Week(4), Thursday, November}
 Union is a slice of Schedules. `IsOccurring` is satisfied if any member of the slice is occurring. (Set union).
 
 ```go
-weekends := recurrence.Union{Saturday, Sunday}
+weekends := recurrence.Union{recurrence.Saturday, recurrence.Sunday}
 ```
 
 ### Exclusion
@@ -72,9 +98,8 @@ weekends := recurrence.Union{Saturday, Sunday}
 Exclusion computes the set difference between two schedules.
 
 ```go
-the_last_day_of_every_month_except_september := recurrence.Exclusion{
-   Day(Last),
-   September,
+every_friday_except_the_last := recurrence.Exclusion{
+  Schedule: recurrence.Friday,
+  Exclude: recurrence.Week(recurrence.Last)
 }
 ```
-

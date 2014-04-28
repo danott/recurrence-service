@@ -9,8 +9,8 @@ import (
 )
 
 type PreviewParams struct {
-	TimeRange r.TimeRange      `json:"timeRange"`
-	Schedule  r.ScheduleStruct `json:"schedule"`
+	TimeRange r.TimeRange   `json:"timeRange"`
+	Schedule  r.AnySchedule `json:"schedule"`
 }
 
 func (rp PreviewParams) Validate(errors *binding.Errors, req *http.Request) {

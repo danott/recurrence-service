@@ -9,6 +9,13 @@ import (
 	"github.com/danott/recurrence"
 )
 
+func ScheduleBootstrap(ren render.Render, store simpleStore) {
+	for name, schedule := range examples {
+		store[name] = schedule
+	}
+	ren.Redirect("/schedules")
+}
+
 func ScheduleIndex(ren render.Render, store simpleStore) {
 	ren.JSON(200, store)
 }
@@ -42,11 +49,12 @@ func ScheduleDelete(res http.ResponseWriter, params martini.Params, store simple
 	res.WriteHeader(200)
 }
 
-func SchedulePreview(ren render.Render, params previewParams) {
-	params.TimeRange = timeRangeApplyDefaults(params.TimeRange)
+func SchedulePreview(ren render.Render, schedule recurrence.AnySchedule, req *http.Request) {
+	timeRange := timeRangeFromQueryParams(req)
+
 	var dates []time.Time
 
-	for o := range params.Schedule.Occurrences(params.TimeRange) {
+	for o := range schedule.Occurrences(timeRange) {
 		dates = append(dates, o)
 	}
 

@@ -9,14 +9,16 @@ import (
 
 func main() {
 	m := martini.Classic()
+
 	m.Use(render.Renderer())
 	m.Use(database())
 
 	m.Get("/schedules", ScheduleIndex)
-	m.Post("/schedules", binding.Json(recurrence.AnySchedule{}), ScheduleCreate)
+	m.Get("/schedules/bootstrap", ScheduleBootstrap)
 	m.Get("/schedules/:sha", ScheduleShow)
+	m.Post("/schedules", binding.Json(recurrence.AnySchedule{}), ScheduleCreate)
+	m.Post("/schedules/preview", binding.Json(recurrence.AnySchedule{}), SchedulePreview)
 	m.Delete("/schedules/:sha", ScheduleDelete)
-	m.Post("/schedules/preview", binding.Json(previewParams{}), SchedulePreview)
 
 	m.Run()
 }

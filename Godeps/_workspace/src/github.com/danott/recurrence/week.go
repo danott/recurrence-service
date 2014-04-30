@@ -2,6 +2,8 @@ package recurrence
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -30,5 +32,26 @@ func isLastWeekInMonth(t time.Time) bool {
 }
 
 func (self Week) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"week": int(self)})
+	if int(self) == Last {
+		return json.Marshal(map[string]interface{}{"week": "Last"})
+	} else {
+		return json.Marshal(map[string]interface{}{"week": int(self)})
+	}
+}
+
+func (self *Week) UnmarshalJSON(b []byte) error {
+	switch s := string(b); s {
+	case `1`, `2`, `3`, `4`, `5`:
+		i, err := strconv.ParseInt(s, 10, 0)
+		if err != nil {
+			return err
+		}
+		*self = Week(i)
+	case `"Last"`:
+		*self = Week(Last)
+	default:
+		return fmt.Errorf("Week cannot unmarshal %s", b)
+	}
+
+	return nil
 }

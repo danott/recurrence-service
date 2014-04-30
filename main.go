@@ -15,10 +15,10 @@ func main() {
 
 	m.Get("/schedules", ScheduleIndex)
 	m.Get("/schedules/bootstrap", ScheduleBootstrap)
-	m.Get("/schedules/:sha", ScheduleShow)
+	m.Get("/schedules/:id", ScheduleShow)
 	m.Post("/schedules", binding.Json(recurrence.AnySchedule{}), ScheduleCreate)
 	m.Post("/schedules/preview", binding.Json(recurrence.AnySchedule{}), SchedulePreview)
-	m.Delete("/schedules/:sha", ScheduleDelete)
+	m.Delete("/schedules/:id", ScheduleDelete)
 
 	m.Run()
 }

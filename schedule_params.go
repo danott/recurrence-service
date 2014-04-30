@@ -7,20 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/codegangsta/martini-contrib/binding"
 	"github.com/danott/recurrence"
 )
-
-type previewParams struct {
-	TimeRange recurrence.TimeRange   `json:"timeRange"`
-	Schedule  recurrence.AnySchedule `json:"schedule"`
-}
-
-func (rp previewParams) Validate(errors *binding.Errors, req *http.Request) {
-	if rp.Schedule.Schedule == nil {
-		errors.Fields["schedule"] = "Required."
-	}
-}
 
 func timeRangeApplyDefaults(tr recurrence.TimeRange) recurrence.TimeRange {
 	if tr.Start.IsZero() {

@@ -8,19 +8,7 @@ import (
 var (
 	examples = map[string]recurrence.Schedule{
 		"thanksgiving": recurrence.Intersection{recurrence.Week(4), recurrence.Thursday, recurrence.November},
-		"complicated": recurrence.Exclusion{
-			Schedule: recurrence.Union{
-				recurrence.Monday,
-				recurrence.Friday,
-				recurrence.OrdinalWeekday(recurrence.Last, recurrence.Wednesday),
-			},
-			Exclude: recurrence.Intersection{
-				recurrence.Monday,
-				recurrence.January,
-				recurrence.Year(2015),
-			},
-		},
-		"weekends": recurrence.Union{recurrence.Saturday, recurrence.Sunday},
+		"weekends":     recurrence.Union{recurrence.Saturday, recurrence.Sunday},
 	}
 )
 

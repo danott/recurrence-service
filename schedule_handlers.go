@@ -28,7 +28,7 @@ func ScheduleCreate(ren render.Render, schedule recurrence.AnySchedule, store si
 
 func ScheduleShow(ren render.Render, params martini.Params, store simpleStore, req *http.Request) {
 	timeRange := timeRangeFromQueryParams(req)
-	schedule, ok := store[params["sha"]]
+	schedule, ok := store[params["id"]]
 
 	if !ok {
 		ren.Error(404)
@@ -45,7 +45,7 @@ func ScheduleShow(ren render.Render, params martini.Params, store simpleStore, r
 }
 
 func ScheduleDelete(res http.ResponseWriter, params martini.Params, store simpleStore) {
-	delete(store, params["sha"])
+	delete(store, params["id"])
 	res.WriteHeader(200)
 }
 

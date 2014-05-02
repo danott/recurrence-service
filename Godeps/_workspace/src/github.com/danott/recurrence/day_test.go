@@ -3,6 +3,7 @@ package recurrence
 import (
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 func TestDayIncludes(t *testing.T) {
@@ -22,6 +23,26 @@ func TestDayIncludes(t *testing.T) {
 	assertIsOnlyOccurring(t, r, Day(Last), "2006-01-31", "2006-02-28", "2006-03-31",
 		"2006-04-30", "2006-05-31", "2006-06-30", "2006-07-31", "2006-08-31",
 		"2006-09-30", "2006-10-31", "2006-11-30", "2006-12-31")
+}
+
+func TestDayOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2009-12-31"))}
+
+	expectations := map[Schedule]int{
+		Day(1):    48,
+		Day(2):    48,
+		Day(3):    48,
+		Day(4):    48,
+		Day(5):    48,
+		Day(27):   48,
+		Day(28):   48,
+		Day(29):   45,
+		Day(30):   44,
+		Day(31):   28,
+		Day(Last): 48,
+	}
+
+	assertOccurrenceGeneration(t, tr, expectations)
 }
 
 func TestDayMarshalJSON(t *testing.T) {
@@ -83,6 +104,21 @@ func TestDayUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if output != expected || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkDayOccurrences(b *testing.B) {
+	d := Day(1)
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	for n := 0; n < b.N; n++ {
+		ch := d.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }

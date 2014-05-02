@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestIntersection(t *testing.T) {
@@ -15,6 +16,18 @@ func TestIntersection(t *testing.T) {
 
 	assertIsOnlyOccurring(t, r, i, "2006-01-01", "2006-01-08", "2006-01-15",
 		"2006-01-22", "2006-01-29")
+}
+
+func TestIntersectionOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2009-12-31"))}
+
+	expectations := map[int]Schedule{
+		8: Intersection{Friday, Day(13)},
+		4: Intersection{November, Thursday, Week(4)},
+		3: Intersection{Day(Last), Day(28)},
+	}
+
+	assertOccurrenceGeneration2(t, tr, expectations)
 }
 
 func TestIntersectionMarshalJSON(t *testing.T) {
@@ -42,6 +55,21 @@ func TestIntersectionUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if !reflect.DeepEqual(output, expected) || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkIntersectionOccurrences(b *testing.B) {
+	d := Intersection{November, Thursday, Week(4)}
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	for n := 0; n < b.N; n++ {
+		ch := d.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }

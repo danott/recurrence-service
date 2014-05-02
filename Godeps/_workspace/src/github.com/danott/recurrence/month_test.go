@@ -3,6 +3,7 @@ package recurrence
 import (
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 func TestMonth(t *testing.T) {
@@ -105,6 +106,27 @@ func TestMonth(t *testing.T) {
 		"2006-12-28", "2006-12-29", "2006-12-30", "2006-12-31")
 }
 
+func TestMonthOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2009-12-31"))}
+
+	expectations := map[Schedule]int{
+		January:   124,
+		February:  113,
+		March:     124,
+		April:     120,
+		May:       124,
+		June:      120,
+		July:      124,
+		August:    124,
+		September: 120,
+		October:   124,
+		November:  120,
+		December:  124,
+	}
+
+	assertOccurrenceGeneration(t, tr, expectations)
+}
+
 func TestMonthMarshalJSON(t *testing.T) {
 	tests := map[string]Month{
 		`{"month":"January"}`:   January,
@@ -162,6 +184,21 @@ func TestMonthUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if output != expected || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkMonthOccurrences(b *testing.B) {
+	d := January
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	for n := 0; n < b.N; n++ {
+		ch := d.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }

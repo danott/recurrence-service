@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestUnion(t *testing.T) {
@@ -19,6 +20,17 @@ func TestUnion(t *testing.T) {
 		"2006-02-28", "2006-03-31", "2006-04-30", "2006-05-31", "2006-06-30",
 		"2006-07-31", "2006-08-31", "2006-09-30", "2006-10-31", "2006-11-30",
 		"2006-12-31")
+}
+
+func TestUnionOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2009-12-31"))}
+
+	expectations := map[int]Schedule{
+		368: Union{June, July, August},
+		626: Union{Monday, Wednesday, Friday},
+	}
+
+	assertOccurrenceGeneration2(t, tr, expectations)
 }
 
 func TestUnionMarshalJSON(t *testing.T) {
@@ -46,6 +58,21 @@ func TestUnionUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if !reflect.DeepEqual(output, expected) || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkUnionOccurrences(b *testing.B) {
+	d := Union{January, March, May, Day(1), Day(Last)}
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	for n := 0; n < b.N; n++ {
+		ch := d.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@ package recurrence
 import (
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 func TestWeek(t *testing.T) {
@@ -25,6 +26,21 @@ func TestWeek(t *testing.T) {
 
 	assertIsOnlyOccurring(t, tr, Week(Last), "2006-01-25", "2006-01-26",
 		"2006-01-27", "2006-01-28", "2006-01-29", "2006-01-30", "2006-01-31")
+}
+
+func TestWeekOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2006-12-31"))}
+
+	expectations := map[Schedule]int{
+		Week(1):    84,
+		Week(2):    84,
+		Week(3):    84,
+		Week(4):    84,
+		Week(5):    29,
+		Week(Last): 84,
+	}
+
+	assertOccurrenceGeneration(t, tr, expectations)
 }
 
 func TestWeekMarshalJSON(t *testing.T) {
@@ -60,6 +76,28 @@ func TestWeekUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if output != expected || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkWeekOccurrences(b *testing.B) {
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	var w Week
+	for n := 0; n < b.N; n++ {
+		run := n % 6
+		if run == 0 {
+			w = Week(Last)
+		} else {
+			w = Week(run)
+		}
+
+		ch := w.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }

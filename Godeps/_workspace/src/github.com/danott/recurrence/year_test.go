@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestYear(t *testing.T) {
@@ -19,6 +20,20 @@ func TestYear(t *testing.T) {
 	refuteAllOccurring(t, YearRange(2005), y)
 	refuteAllOccurring(t, YearRange(2006), y)
 	assertAllOccurring(t, YearRange(2007), y)
+}
+
+func TestYearOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2000-01-01")), time.Time(NewDate("3000-01-01"))}
+	expectations := map[Schedule]int{
+		Year(2525): 365,
+	}
+	assertOccurrenceGeneration(t, tr, expectations)
+
+	tr = TimeRange{time.Time(NewDate("2525-12-31")), time.Time(NewDate("3000-01-01"))}
+	expectations = map[Schedule]int{
+		Year(2525): 1,
+	}
+	assertOccurrenceGeneration(t, tr, expectations)
 }
 
 func TestYearMarshalJSON(t *testing.T) {
@@ -56,6 +71,21 @@ func TestYearUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if output != expected || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkYearOccurrences(b *testing.B) {
+	d := Year(2525)
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	for n := 0; n < b.N; n++ {
+		ch := d.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }

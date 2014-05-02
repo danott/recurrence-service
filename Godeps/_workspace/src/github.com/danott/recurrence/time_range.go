@@ -17,22 +17,18 @@ func (self TimeRange) IsOccurring(t time.Time) bool {
 }
 
 func (self TimeRange) Occurrences(other TimeRange) chan time.Time {
-	return self.occurrencesOfSchedule(other)
-}
-
-func (self TimeRange) occurrencesOfSchedule(s Schedule) chan time.Time {
-	c := make(chan time.Time)
+	ch := make(chan time.Time)
 
 	go func() {
 		for t := range self.eachDate() {
-			if s.IsOccurring(t) {
-				c <- t
+			if other.IsOccurring(t) {
+				ch <- beginningOfDay(t)
 			}
 		}
-		close(c)
+		close(ch)
 	}()
 
-	return c
+	return ch
 }
 
 func (self TimeRange) eachDate() chan time.Time {
@@ -66,7 +62,7 @@ func (self *TimeRange) UnmarshalJSON(b []byte) error {
 }
 
 func beginningOfDay(t time.Time) time.Time {
-	return t.Add(time.Hour * -12).Round(time.Hour * 24)
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
 
 // Generate a TimeRange representing the entire year.

@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/codegangsta/martini"
@@ -40,6 +41,7 @@ func ScheduleShow(ren render.Render, params martini.Params, store simpleStore, r
 	for o := range schedule.Occurrences(timeRange) {
 		dates = append(dates, o)
 	}
+	sort.Sort(byDate(dates))
 
 	ren.JSON(200, dates)
 }
@@ -57,6 +59,7 @@ func SchedulePreview(ren render.Render, schedule recurrence.AnySchedule, req *ht
 	for o := range schedule.Occurrences(timeRange) {
 		dates = append(dates, o)
 	}
+	sort.Sort(byDate(dates))
 
 	ren.JSON(200, dates)
 }
